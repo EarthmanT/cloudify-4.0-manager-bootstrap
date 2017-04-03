@@ -9,7 +9,7 @@ This README requires that you have installed the Cloudify 4.0 CLI on your workst
 * I have a VM that I want to install Cloudify Manager on. [See Bootstrap](#Bootstrap).
 
 
-#### Pre-baked Image
+## Pre-baked Image
 
 Cloudify manager is distributed as a pre-baked image in the following image formats and marketplaces:
 
@@ -54,7 +54,7 @@ All other fields are optional. Most frequently you will want to change the regio
 
 **Note:**
 > If you want to use a pre-baked image, set the value of the example_aws_virtual_machine_image_id input the AMI of pre-baked Cloudify 4.0 manager image.
-> The current versions for each version are documented on (our website)[http://getcloudify.org/downloads/get_cloudify.html].
+> The current versions for each region are documented on (our website)[http://getcloudify.org/downloads/get_cloudify.html].
 
 Now install the AWS infrastructure:
 
@@ -84,7 +84,7 @@ $ cfy node-instances example_aws_elastic_ip
 ]
 ```
 
-**The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
+_The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from_ ```cfy deployments outputs```.
 
 
 ### Azure Infrastructure Installation
@@ -117,11 +117,10 @@ All other fields are optional.
 
 **Note:**
 > If you want to use a pre-baked image, set the value of the example_azure_virtual_machine_resource_config input to the following:
-> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
-> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
-> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
-> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
-> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYX
 
 
 Now install the Azure infrastructure:
@@ -160,7 +159,7 @@ $ cfy node-instances example_azure_virtual_machine
 ]
 ```
 
-**The value of the example_azure_virtual_machine public_ip runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
+_The value of the example_azure_virtual_machine public_ip runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from_ ```cfy deployments outputs```.
 
 
 ### Openstack Infrastructure Installation
@@ -220,12 +219,12 @@ $ cfy node-instances example_openstack_floating_ip
 
 ```
 
-**The value of the example_openstack_floating_ip floating_ip_address runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
+_The value of the example_openstack_floating_ip floating_ip_address runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from_ ```cfy deployments outputs```.
 
 
 ## Bootstrap
 
-If you have a clean Centos or RHELL VM that you want to install Cloudify 4.0 manager on, then you need to bootstrap.
+If you have a clean Centos or RHEL VM that you want to install Cloudify 4.0 manager on, then you need to bootstrap. If you used a pre-baked image to install your manager, skip to (manager configuration)[#Manager Configuration].
 
 First, log into the VM, install the Cloudify RPM, and copy your Cloudify 4.0 manager inputs file to your local directory.
 
@@ -264,6 +263,14 @@ Manager password is [manager_password]
 
 At the end of the bootstrap process the admin default_tenant username is printed. Use it in the next step.
 
+## Manager Configuration
+
+There are a few recommended steps for configuring your manager.
+
+### Create profiles and tenants.
+
+First you will create a profile in your Cloudify CLI:
+
 ```shell
 $ cfy profiles use [public_ip] --profile-name [alias] -s [ssh_user] -k [ssh_key_filename] -u admin -p [manager_password] -t default_tenant
 Attempting to connect...
@@ -272,20 +279,43 @@ Initialization completed successfully
 Using manager [public_ip] with port 80
 ```
 
+Then you will create any tenants that you need and switch to the tenants for further configuration:
+
+```shell
+$ cfy tenants create demo
+$ cfy profiles use [public_ip] --profile-name [alias-demo] -u admin -p [manager_password] -t demo
+Attempting to connect...
+Initializing profile azure...
+Initialization completed successfully
+Using manager [public_ip] with port 80
+```
+
+### Last add your secrets:
+
+_Secrets are shared with tenants._
+
+#### AWS
+
+```shell
+$ cfy secrets create aws_access_key_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create aws_secret_access_key -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
+
+#### Azure
+
+```shell
+$ cfy secrets create subscription_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create tenant_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create client_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create client_secret -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
 
 
+#### Openstack
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```shell
+$ cfy secrets create keystone_username -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create keystone_password -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create keystone_tenant_name -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+$ cfy secrets create keystone_url -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+```
