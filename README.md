@@ -52,6 +52,10 @@ _If you do not have these credentials, follow these (instructions)[http://stacko
 
 All other fields are optional. Most frequently you will want to change the region. In that case, you will also need to update the *Region Overrides* section in the example.
 
+**Note:**
+> If you want to use a pre-baked image, set the value of the example_aws_virtual_machine_image_id input the AMI of pre-baked Cloudify 4.0 manager image.
+> The current versions for each version are documented on (our website)[http://getcloudify.org/downloads/get_cloudify.html].
+
 Now install the AWS infrastructure:
 
 ```shell
@@ -80,7 +84,7 @@ $ cfy node-instances example_aws_elastic_ip
 ]
 ```
 
-**The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase.**
+**The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
 
 
 ### Azure Infrastructure Installation
@@ -110,6 +114,15 @@ Uncomment and provide the following fields:
 _If you do not have these credentials, follow these (instructions)[https://docs.microsoft.com/en-us/rest/api/#client-registration] or talk to your administrator._
 
 All other fields are optional.
+
+**Note:**
+> If you want to use a pre-baked image, set the value of the example_azure_virtual_machine_resource_config input to the following:
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+> XYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYXXYXYXYXYXYXYXYXYXYXYXYX
+
 
 Now install the Azure infrastructure:
 
@@ -146,6 +159,68 @@ $ cfy node-instances example_azure_virtual_machine
 ...
 ]
 ```
+
+**The value of the example_azure_virtual_machine public_ip runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
+
+
+### Openstack Infrastructure Installation
+
+Prepare your Openstack inputs file.
+
+```shell
+$ cp aws-azure-openstack-blueprint-4.0/inputs/openstack.yaml.example inputs.yaml
+```
+
+Uncomment and provide the following fields:
+
+- keystone_username
+- keystone_password
+- keystone_tenant_name
+- keystone_url
+- region
+- example_openstack_virtual_machine_image_id
+- example_openstack_virtual_machine_flavor_id
+
+_If you do not have these credentials, follow these instructions (keystone v2)[https://docs.openstack.org/developer/python-keystoneclient/using-api-v2.html] or (keystone v3)[https://docs.openstack.org/developer/python-keystoneclient/using-api-v3.html] or talk to your administrator._
+
+**Note:**
+> If you want to use a pre-baked image, set the value of the example_openstack_virtual_machine_image_id input the image_id of pre-baked Cloudify 4.0 manager image.
+> If you do not have one in your Openstack account, download an image from (our website)[http://getcloudify.org/downloads/get_cloudify.html].
+> Then upload it to your openstack via the (Horizon UI)[https://docs.openstack.org/user-guide/dashboard-manage-images.html] or via (Glance)[https://docs.openstack.org/cli-reference/glance.html].
+
+Now install the Openstack infrastructure:
+
+```shell
+$ cfy install aws-azure-openstack-blueprint-4.0/openstack/blueprint.yaml -i inputs.yaml --task-retries=15 --task-retry-interval=15```
+Initializing local profile ...
+Initialization completed successfully
+Initializing blueprint...
+Initialized blueprint.yaml
+If you make changes to the blueprint, run `cfy init blueprint.yaml` again to apply them
+2019-12-31 00:00:00.000  CFY <local> Starting 'install' workflow execution
+```
+
+To get information about a resource, you can run:
+
+```shell
+$ cfy node-instances example_openstack_floating_ip
+[
+...
+  {
+...
+    "name": "example_openstack_floating_ip",
+...
+    "runtime_properties": {
+      "floating_ip_address": "XXX.XX.XXX.XX"
+    },
+...
+  }
+...
+]
+
+```
+
+**The value of the example_openstack_floating_ip floating_ip_address runtime property is the IP that you will use to install your Cloudify Manager in the Bootstrap phase. You can also get this value from ```cfy deployments outputs```**
 
 
 ## Bootstrap
