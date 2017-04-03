@@ -1,8 +1,8 @@
 # cloudify-4.0-manager-bootstrap
 
-## Management Environment.
+## Management Environment Installation
 
-We assume that you have existing Cloud infrastructure that you want to manage with Cloudify, including a specific network/VPC/etc.
+We assume that you have existing Cloud infrastructure that you want to manage with Cloudify, including a specific network/VPC/etc. If we guessed, right, skip to Bootstrap.
 
 If that assumption is false, we have several example infrastructure blueprints that you can use to deploy your Cloudify Manager. To use these examples, first download and extract the example repository:
 
@@ -10,7 +10,7 @@ If that assumption is false, we have several example infrastructure blueprints t
 $ curl -L https://github.com/cloudify-examples/aws-azure-openstack-blueprint/archive/4.0.tar.gz | tar xv
 ```
 
-#### AWS Infrastructure Installation
+### AWS Infrastructure Installation
 
 Prepare your AWS inputs file.
 
@@ -39,30 +39,7 @@ If you make changes to the blueprint, run `cfy init blueprint.yaml` again to app
 2019-12-31 00:00:00.000  CFY <local> Starting 'install' workflow execution
 ```
 
-When the installation is completed, you can see the resources that were created.
-
-```shell
-$ cfy deployments outputs
-...
-{
-...
-  "example_aws_private_subnet":
-    "example_aws_private_subnet": "subnet-20e90f69"
-  },
-...
-...
-  "example_aws_public_subnet":
-    "example_aws_public_subnet": "subnet-b7ed0bfe"
-  },
-...
-  "example_aws_vpc": {
-    "example_aws_vpc": "vpc-644d5400"
-  }
-...
-}
-```
-
-To get information about only one resource, you can run:
+To get information about a resource, you can run:
 
 ```shell
 $ cfy node-instances example_aws_elastic_ip
@@ -78,7 +55,72 @@ $ cfy node-instances example_aws_elastic_ip
 ]
 ```
 
-*The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase.*
+**The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase.**
+
+
+### Azure Infrastructure Installation
+
+To prepare for this install, make sure that you have a key pair. If you do not generate them with these (instructions)[https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent].
+
+Copy the public key material that you generated:
+
+```shell
+$ cat ~/.ssh/id_rsa.pub # copy this to clipboard.
+```
+
+Prepare your Azure inputs file.
+
+```shell
+$ cp aws-azure-openstack-blueprint-4.0/inputs/azure.yaml.example inputs.yaml
+```
+
+Uncomment and provide the following fields:
+
+- subscription_id
+- tenant_id
+- client_id
+- client_secret
+- example_azure_virtual_machine_public_key_data
+
+_If you do not have these credentials, follow these (instructions)[https://docs.microsoft.com/en-us/rest/api/#client-registration] or talk to your administrator._
+
+All other fields are optional.
+
+Now install the Azure infrastructure:
+
+```shell
+$ cfy install aws-azure-openstack-blueprint-4.0/azure/blueprint.yaml -i inputs.yaml --task-retries=15 --task-retry-interval=15```
+Initializing local profile ...
+Initialization completed successfully
+Initializing blueprint...
+Initialized blueprint.yaml
+If you make changes to the blueprint, run `cfy init blueprint.yaml` again to apply them
+2019-12-31 00:00:00.000  CFY <local> Starting 'install' workflow execution
+```
+
+To get information about a resource, you can run:
+
+```shell
+$ cfy node-instances example_azure_virtual_machine
+
+[
+...
+  {
+...
+    "name": "example_azure_virtual_machine",
+...
+    "runtime_properties": {
+...
+      "ip": "10.10.1.4",
+...
+      "public_ip": "XX.XXX.XX.XX"
+    },
+    "state": "started",
+    "version": 9
+  }
+...
+]
+```
 
 
 ## Bootstrap
