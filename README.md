@@ -1,15 +1,18 @@
-# cloudify-4.0-manager-bootstrap
+# Installing Cloudify 4.0 Manager
 
 ## Prerequisites
 
 This README requires that you have installed the Cloudify 4.0 CLI on your workstation. See (instructions)[http://docs.getcloudify.org/4.0.0/installation/installation-overview/].
 
-* I want to use a pre-baked Cloudify 4.0 manager image. [See pre-baked image](#Pre-baked Image).
-* I need to create the environment (networks, VMs) that I will install Cloudify on [See Management Environment Installation](#Management Environment Installation).
-* I have a VM that I want to install Cloudify Manager on. [See Bootstrap](#Bootstrap).
+The following user stories are fully explained:
+* I want to use a pre-baked Cloudify 4.0 manager image. [See pre-baked image](#About the pre-baked image option).
+* I need to create the environment (networks, VMs) that I will install Cloudify on [See management environment installation](#Management environment installation).
+* I have a VM that I want to install Cloudify Manager on. [See bootstrap](#Bootstrap).
+* I have a Cloudify 4.0 manager and I want to configure it. See [manager configuration](#Manager configuration)
+* I have a blueprint for a previous version of Cloudify and I want to use it with my new Cloudify 4.0 manager. [See Bootstrap](#Using pre-4.0 blueprint with a 4.0 manager).
 
 
-## Pre-baked Image
+## About the pre-baked image option
 
 Cloudify manager is distributed as a pre-baked image in the following image formats and marketplaces:
 
@@ -25,7 +28,7 @@ Pre-baked images are useful for users who do not have advanced security requirem
 **Note:** _If you want to use pre-baked images, but have restrictions that prevent you from using on of our's, you can build your own images using the (cloudify-image-bakery)[https://github.com/cloudify-cosmo/cloudify-image-bakery]._
 
 
-## Management Environment Installation
+## Management environment installation
 
 We assume that you have existing Cloud infrastructure that you want to manage with Cloudify, including a specific network/VPC/etc. If we guessed, right, skip to Bootstrap.
 
@@ -263,7 +266,7 @@ Manager password is [manager_password]
 
 At the end of the bootstrap process the admin default_tenant username is printed. Use it in the next step.
 
-## Manager Configuration
+## Manager configuration
 
 There are a few recommended steps for configuring your manager.
 
@@ -283,6 +286,7 @@ Then you will create any tenants that you need and switch to the tenants for fur
 
 ```shell
 $ cfy tenants create demo
+Tenant `demo` created
 $ cfy profiles use [public_ip] --profile-name [alias-demo] -u admin -p [manager_password] -t demo
 Attempting to connect...
 Initializing profile azure...
@@ -290,7 +294,7 @@ Initialization completed successfully
 Using manager [public_ip] with port 80
 ```
 
-### Last add your secrets:
+### Add your secrets:
 
 _Secrets are shared with tenants._
 
@@ -298,16 +302,22 @@ _Secrets are shared with tenants._
 
 ```shell
 $ cfy secrets create aws_access_key_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `aws_access_key_id` created
 $ cfy secrets create aws_secret_access_key -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `aws_secret_access_key` created
 ```
 
 #### Azure
 
 ```shell
 $ cfy secrets create subscription_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `subscription_id` created
 $ cfy secrets create tenant_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `tenant_id` created
 $ cfy secrets create client_id -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `client_id` created
 $ cfy secrets create client_secret -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `client_secret` created
 ```
 
 
@@ -315,7 +325,32 @@ $ cfy secrets create client_secret -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 ```shell
 $ cfy secrets create keystone_username -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `keystone_username` created
 $ cfy secrets create keystone_password -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `keystone_password` created
 $ cfy secrets create keystone_tenant_name -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `keystone_tenant_name` created
 $ cfy secrets create keystone_url -s AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+Secret `keystone_url` created
 ```
+
+### Upload plugins to the manager:
+
+**Note:** You need to download the plugin packages from (our website)[http://getcloudify.org/downloads/plugin-packages.html]:
+
+**Example:**
+
+```shell
+$ curl -O http://repository.cloudifysource.org/cloudify/wagons/cloudify-diamond-plugin/1.3.5/cloudify_diamond_plugin-1.3.5-py27-none-linux_x86_64-centos-Core.wgn
+$ curl -O http://repository.cloudifysource.org/cloudify/wagons/cloudify-diamond-plugin/1.3.5/cloudify_diamond_plugin-1.3.5-py27-none-linux_x86_64-Ubuntu-trusty.wgn
+$ curl -O http://repository.cloudifysource.org/cloudify/wagons/cloudify-openstack-plugin/2.0.1/cloudify_openstack_plugin-2.0.1-py27-none-linux_x86_64-centos-Core.wgn
+$ curl -O http://repository.cloudifysource.org/cloudify/wagons/cloudify-aws-plugin/1.4.4/cloudify_aws_plugin-1.4.4-py27-none-linux_x86_64-centos-Core.wgn
+$ cfy plugins upload cloudify_diamond_plugin-1.3.5-py27-none-linux_x86_64-centos-Core.wgn
+$ cfy plugins upload cloudify_diamond_plugin-1.3.5-py27-none-linux_x86_64-Ubuntu-trusty.wgn
+$ cfy plugins upload cloudify_openstack_plugin-2.0.1-py27-none-linux_x86_64-centos-Core.wgn
+$ cfy plugins upload cloudify_aws_plugin-1.4.4-py27-none-linux_x86_64-centos-Core.wgn
+```
+
+### Using pre-4.0 blueprint with a 4.0 manager
+
+**We will support a method for configuring managers to support blueprints writing for Cloudify <4.0.**
