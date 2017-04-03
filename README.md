@@ -1,5 +1,30 @@
 # cloudify-4.0-manager-bootstrap
 
+## Prerequisites
+
+This README requires that you have installed the Cloudify 4.0 CLI on your workstation. See (instructions)[http://docs.getcloudify.org/4.0.0/installation/installation-overview/].
+
+* I want to use a pre-baked Cloudify 4.0 manager image. [See pre-baked image](#Pre-baked Image).
+* I need to create the environment (networks, VMs) that I will install Cloudify on [See Management Environment Installation](#Management Environment Installation).
+* I have a VM that I want to install Cloudify Manager on. [See Bootstrap](#Bootstrap).
+
+
+#### Pre-baked Image
+
+Cloudify manager is distributed as a pre-baked image in the following image formats and marketplaces:
+
+* [QCow2](http://getcloudify.org/downloads/get_cloudify.html)
+* [VMDK](http://getcloudify.org/downloads/get_cloudify.html)
+* [AWS Marketplace](http://getcloudify.org/downloads/get_cloudify.html)
+* [Azure Marketplace](http://getcloudify.org/downloads/get_cloudify.html)
+
+Pre-baked images are useful for users who do not have advanced security requirements or environment restrictions. They are also the fastest installation method.
+
+**Note:** If you are going to create your management environment using our example blueprints, you can use the pre-baked images. There are special instructions in the installation steps for each Cloud.
+
+**Note:** _If you want to use pre-baked images, but have restrictions that prevent you from using on of our's, you can build your own images using the (cloudify-image-bakery)[https://github.com/cloudify-cosmo/cloudify-image-bakery]._
+
+
 ## Management Environment Installation
 
 We assume that you have existing Cloud infrastructure that you want to manage with Cloudify, including a specific network/VPC/etc. If we guessed, right, skip to Bootstrap.
@@ -189,13 +214,3 @@ Using manager [public_ip] with port 80
 
 
 
-Screening Questions:
-
-Questions to answer before installing your Cloudify 4.0 manager:
-Does the VM that I want to install Cloudify Manager on already exist?
-Do I already have an environment that I want to install my Cloudify Manager on?
-Can I use a pre-baked image?
-
-Questions to answer after installing your Cloudify 4.0 manager:
-Do I have an existing Cloudify Manager that I want to upgrade?
-Do I have blueprints from an earlier Cloudify version that I want to use?
