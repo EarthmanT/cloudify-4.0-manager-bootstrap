@@ -1,4 +1,0 @@
-tosca_definitions_version: cloudify_dsl_1_3
-
-imports:
-  - volume.yaml

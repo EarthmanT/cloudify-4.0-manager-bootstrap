@@ -76,6 +76,7 @@ $ cfy node-instances example_aws_elastic_ip
      "aws_resource_id": "XX.XXX.XX.X",
 ...
 ]
+```
 
 *The value of the _example_aws_elastic_ip_ is the IP that you will use to install your Cloudify Manager in the Bootstrap phase.*
 
