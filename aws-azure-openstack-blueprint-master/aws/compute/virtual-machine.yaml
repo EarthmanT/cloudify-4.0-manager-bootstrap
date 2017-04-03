@@ -1,0 +1,61 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+inputs:
+
+  use_existing_example_aws_virtual_machine:
+    type: boolean
+    default: false
+
+  example_aws_virtual_machine:
+    type: string
+    default: ''
+
+  example_aws_virtual_machine_image_id:
+    default: ami-165bdf01 # Cloudify Manager AMI
+
+  example_aws_virtual_machine_instance_type:
+    default: m3.large
+
+  example_aws_virtual_machine_name:
+    default: 'Cloudify Manager 4.0'
+
+  example_aws_virtual_machine_tags:
+    default: { get_input: default_tags }
+
+  example_aws_virtual_machine_block_device_mapping:
+    default:
+      '/dev/sda1':
+        delete_on_termination: true
+
+node_templates:
+
+  example_aws_virtual_machine:
+    type: cloudify.aws.nodes.Instance
+    properties:
+      aws_config: { get_input: aws_configuration }
+      use_external_resource: { get_input: use_existing_example_aws_virtual_machine }
+      resource_id: { get_input: example_aws_virtual_machine }
+      name: { get_input: example_aws_virtual_machine_name }
+      tags: { get_input: example_aws_virtual_machine_tags }
+      agent_config:
+        install_method: none
+      image_id: { get_input: example_aws_virtual_machine_image_id }
+      instance_type: { get_input: example_aws_virtual_machine_instance_type }
+      parameters:
+        block_device_map: { get_input: example_aws_virtual_machine_block_device_mapping }
+        placement: { get_property: [ example_aws_public_subnet, availability_zone ] }
+    relationships:
+      - type: cloudify.aws.relationships.instance_connected_to_eni
+        target: example_aws_public_network_interface
+      - type: cloudify.aws.relationships.instance_connected_to_eni
+        target: example_aws_private_network_interface
+      - type: cloudify.aws.relationships.instance_connected_to_keypair
+        target: example_aws_key
+
+outputs:
+
+  example_aws_virtual_machine:
+    description: AWS Example Instance
+    value:
+      example_aws_virtual_machine: { get_attribute: [ example_aws_virtual_machine, aws_resource_id ] }
+      example_aws_virtual_machine_private_ip: { get_attribute: [ example_aws_virtual_machine, ip ] }

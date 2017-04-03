@@ -1,0 +1,34 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+inputs:
+
+  use_existing_example_openstack_volume:
+    type: boolean
+    default: false
+
+  example_openstack_volume:
+    type: string
+    default: 'example-openstack-volume'
+
+  volume_size:
+    default: 2
+
+node_templates:
+
+  example_openstack_volume:
+    type: cloudify.openstack.nodes.Volume
+    properties:
+      openstack_config: { get_input: openstack_configuration }
+      use_external_resource: { get_input: use_existing_example_openstack_volume }
+      resource_id: { get_input: example_openstack_volume }
+      volume:
+        size: { get_input: volume_size }
+    relationships:
+      - type: cloudify.openstack.volume_attached_to_server
+        target: example_openstack_virtual_machine
+
+outputs:
+  example_openstack_volume:
+    description: Openstack Volume
+    value:
+      example_openstack_group: { get_attribute: [ example_openstack_volume, external_id ] }

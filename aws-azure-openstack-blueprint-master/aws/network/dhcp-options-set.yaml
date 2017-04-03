@@ -1,0 +1,44 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+inputs:
+
+  use_existing_example_aws_dhcp_options_set:
+    description: >
+      If you have a DHCP Options set that you want to use this should be true.
+    default: false
+
+  example_aws_dhcp_options_set_id:
+    description: >
+      If you changed the input use_existing_example_aws_dhcp_options_set, then you should put the DHCP Options Set ID here.
+    default: ''
+
+  example_aws_dhcp_options_set_domain_name:
+    default: 'ec2.internal'
+
+  example_aws_dhcp_options_set_domain_name_servers:
+    default: 'AmazonProvidedDNS'
+
+  example_aws_dhcp_options_tags:
+    default: { get_input: default_tags }
+
+node_templates:
+
+  example_aws_dhcp_options_set:
+    type: cloudify.aws.nodes.DHCPOptions
+    properties:
+      aws_config: { get_input: aws_configuration }
+      use_external_resource: { get_input: use_existing_example_aws_dhcp_options_set }
+      resource_id: { get_input: example_aws_dhcp_options_set_id }
+      domain_name: { get_input: example_aws_dhcp_options_set_domain_name }
+      domain_name_servers: { get_input: example_aws_dhcp_options_set_domain_name_servers }
+      tags: { get_input: example_aws_dhcp_options_tags }
+    relationships:
+      - type: cloudify.aws.relationships.dhcp_options_associated_with_vpc
+        target: example_aws_vpc
+
+outputs:
+
+  example_aws_dhcp_options_set:
+    description: AWS DHCP Options Set
+    value:
+      example_aws_dhcp_options_set: { get_attribute: [ example_aws_dhcp_options_set, aws_resource_id ] }
